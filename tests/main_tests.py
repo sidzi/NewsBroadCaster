@@ -1,16 +1,11 @@
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from nose.tools import *
+import newsbcasttemplater
 
-config = {
-    'description': 'News Broadcast Templater',
-    'author': 'Siddhant',
-    'version': '0.1',
-    'install_requires': ['nose'],
-    'packages': ['NAME'],
-    'scripts': [],
-    'name': 'newsbcasttemplater'
-}
+def setup():
+    print "SETUP!"
 
-setup(**config)
+def teardown():
+    print "TEAR DOWN!"
+
+def test_basic():
+    print "I RAN!"

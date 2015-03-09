@@ -7,8 +7,8 @@ config = {
     'description': 'News Broadcast Templater',
     'author': 'Siddhant',
     'version': '0.1',
-    'install_requires': ['nose'],
-    'packages': ['NAME'],
+    'install_requires': ['nose', 'Kivy'],
+    'packages': ['newsbcaster'],
     'scripts': [],
     'name': 'newsbcasttemplater'
 }

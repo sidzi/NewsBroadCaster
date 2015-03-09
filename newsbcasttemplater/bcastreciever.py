@@ -35,7 +35,6 @@ while True:
             print "complete recv" + str(len(message) == length)
             break
     s.sendall("FINISH")
-
     s.close()
     frame = pickle.loads(message)
     print frame

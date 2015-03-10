@@ -14,13 +14,17 @@ s.bind((TCP_IP, TCP_PORT))
 s.listen(1)
 conn, addr = s.accept()
 print 'Connection address:', addr
+while True:
+    conn.send(str(cap.get(7)) + ";;" + str(cap.get(3)) + "::" + str(cap.get(4)) + "??" + str(cap.get(5)))
+    if "OK" in str(conn.recv(128)):
+        break
 
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
         break
     data = datawithlength = ""
-    while True:
+    while ret:
         data = pickle.dumps(frame)
         datawithlength = str(len(data)) + '::' + data
         print str(len(data))

@@ -4,16 +4,16 @@ import pickle
 import cv2
 
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-host = "localhost"
-port = 5000
+TCP_IP = "localhost"
+TCP_PORT = 5000
 BUFFER_SIZE = 4096
-
-s.connect((host, port))
+connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+connection.bind((TCP_IP, TCP_PORT))
+connection.listen(1)
+conn, addr = connection.accept()
 i = 0
 while True:
-    vid_metadata = str(s.recv(1024))
+    vid_metadata = str(connection.recv(1024))
 
     # noinspection PyRedeclaration
     num_frames, sep, vid_metadata = vid_metadata.partition(';;')
@@ -26,7 +26,7 @@ while True:
 
     num_frames = int(float(num_frames))
     if vid_metadata:
-        s.sendall(b'OK')
+        connection.sendall(b'OK')
         break
 
 fourcc = cv2.cv.CV_FOURCC(*'XVID')
@@ -36,7 +36,7 @@ while True:
     length = None
     message = ""
     while True:
-        data = s.recv(BUFFER_SIZE)
+        data = connection.recv(BUFFER_SIZE)
         if not data:
             break
         if length is None:
@@ -50,15 +50,15 @@ while True:
         if len(message) < length:
             message += data
             if len(message) == length:
-                print "Received Status OK"
+                print "Received Status : OK"
                 break
             elif len(message) > length:
-                print "Recieved Status Overload"
+                print "Recieved Status : Over"
                 break
             else:
                 continue
 
-    s.sendall(b'FINFRAME')
+    connection.sendall(b'FINFRAME')
     i += 1
     print "Now in frame : " + str(i)
     frame = pickle.loads(message)
@@ -66,6 +66,4 @@ while True:
     if i == num_frames or i > num_frames:
         break
 
-cv2.destroyAllWindows()
-s.close()
-
+connection.close()

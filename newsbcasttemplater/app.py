@@ -4,6 +4,11 @@ from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
+from bcastClient import bcaster
+
+
+def callback_start(instance):
+    bcaster()
 
 
 class CasterGUI(FloatLayout):
@@ -16,6 +21,8 @@ class CasterGUI(FloatLayout):
 
         start_button = Button(text="Start Broadcast", background_color=(0, 0, 1, 1), size_hint=(.25, .10),
                               pos_hint={"center_x": 0.25, "center_y": 0.85})
+
+        start_button.bind(on_press=callback_start)
 
         stop_button = Button(text="Stop Broadcast", background_color=(1, 0, 1, 1), size_hint=(.25, 0.10),
                              pos_hint={"center_x": 0.75, "center_y": 0.85})

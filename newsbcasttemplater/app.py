@@ -1,14 +1,16 @@
-from kivy.app import App
+import thread
 
+from kivy.app import App
 from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
-from bcastClient import bcaster
+from bcastClient import BcastClient
 
 
 def callback_start(instance):
-    bcaster()
+    bCC = BcastClient()
+    thread.start_new(bCC.run())
 
 
 class CasterGUI(FloatLayout):

@@ -1,7 +1,7 @@
 import socket
 import pickle
 
-import cv2
+from videoWriter import videoWriter
 
 
 class BcastServer:
@@ -18,27 +18,26 @@ class BcastServer:
         self.connected_host.close()
 
     def run(self):
+        global vid_metadata
         i = 0
         while True:
             vid_metadata = str(self.connected_host.recv(1024))
-
-            # noinspection PyRedeclaration
-            num_frames, sep, vid_metadata = vid_metadata.partition(';;')
-
-            # noinspection PyRedeclaration
-            vid_width, sep, vid_metadata = vid_metadata.partition('::')
-
-            # noinspection PyRedeclaration
-            vid_height, sep, vid_fps = vid_metadata.partition('??')
-
-            num_frames = int(float(num_frames))
             if vid_metadata:
                 self.connected_host.send(b'OK')
                 break
+        # noinspection PyRedeclaration
+        num_frames, sep, vid_metadata = vid_metadata.partition(';;')
 
-        fourcc = cv2.cv.CV_FOURCC('m', 'p', '4', 'v')
-        # noinspection PyUnboundLocalVariable
-        out = cv2.VideoWriter('out.mov', fourcc, float(vid_fps), (int(float(vid_width)), int(float(vid_height))))
+        # noinspection PyRedeclaration
+        vid_width, sep, vid_metadata = vid_metadata.partition('::')
+
+        # noinspection PyRedeclaration
+        vid_height, sep, vid_fps = vid_metadata.partition('??')
+
+        num_frames = int(float(num_frames))
+
+        vW = videoWriter(vid_fps, vid_width, vid_height)
+
         while True:
             length = None
             message = ""
@@ -69,7 +68,7 @@ class BcastServer:
             i += 1
             print "Now in frame : " + str(i)
             frame = pickle.loads(message)
-            out.write(frame)
+            vW.writer(frame)
             if i == num_frames or i > num_frames:
                 break
 

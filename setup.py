@@ -4,10 +4,10 @@ except ImportError:
     from distutils.core import setup
 
 config = {
-    'description': 'News Broadcast Templater',
-    'author': 'Siddhant',
+    'description': 'News Bcaster',
+    'author': 'Siddhant Gupta',
     'version': '0.1',
-    'install_requires': ['nose', 'Kivy'],
+    'install_requires': ['pyaudio'],
     'packages': ['newsbcaster'],
     'scripts': [],
     'name': 'newsbcasttemplater'

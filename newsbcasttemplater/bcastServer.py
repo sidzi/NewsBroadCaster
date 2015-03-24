@@ -66,7 +66,7 @@ class BcastServer:
 
             self.connected_host.send(b'FINFRAME')
             i += 1
-            print "Now in frame : " + str(i)
+            print "Writing frame : " + str(i)
             frame = pickle.loads(message)
             vW.writer(frame)
             if i == num_frames or i > num_frames:

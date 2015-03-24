@@ -5,18 +5,14 @@ from videoReader import videoReader
 
 
 class BcastClient:
-    def __init__(self):
+    def __init__(self, filepath):
         self.TCP_IP = 'localhost'
         self.TCP_PORT = 5000
         self.BUFFER_SIZE = 4096
         self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connection.connect((self.TCP_IP, self.TCP_PORT))
-        self.video = videoReader("lmao.mp4")
+        self.video = videoReader(filepath)
         self.cap = self.video.getcap()
-
-    def close(self):
-        self.video.close()
-        self.connection.close()
 
     def run(self):
         while True:
@@ -39,7 +35,6 @@ class BcastClient:
                     break
         self.close()
 
-
-if __name__ == "__main__":
-    bCS = BcastClient()
-    bCS.run()
+    def close(self):
+        self.video.close()
+        self.connection.close()

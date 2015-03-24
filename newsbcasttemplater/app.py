@@ -1,4 +1,4 @@
-import thread
+from threading import Thread
 
 from kivy.app import App
 from kivy.uix.button import Button
@@ -6,11 +6,6 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from bcastClient import BcastClient
-
-
-def callback_start(instance):
-    bCC = BcastClient()
-    thread.start_new(bCC.run())
 
 
 class CasterGUI(FloatLayout):
@@ -24,7 +19,10 @@ class CasterGUI(FloatLayout):
         start_button = Button(text="Start Broadcast", background_color=(0, 0, 1, 1), size_hint=(.25, .10),
                               pos_hint={"center_x": 0.25, "center_y": 0.85})
 
-        start_button.bind(on_press=callback_start)
+        path_to_video = TextInput(focus=True, text="Enter Filepath", multiline=False, size_hint=(.75, 0.05),
+                                  pos_hint={"center_x": .50, "center_y": .70})
+
+        start_button.bind(on_press=lambda x: self.callback_start(path_to_video.text))
 
         stop_button = Button(text="Stop Broadcast", background_color=(1, 0, 1, 1), size_hint=(.25, 0.10),
                              pos_hint={"center_x": 0.75, "center_y": 0.85})
@@ -32,14 +30,17 @@ class CasterGUI(FloatLayout):
         add_overlay = Button(text="Add Overlay", background_color=(1, 1, 1, 1), size_hint=(.25, 0.10),
                              pos_hint={"center_x": 0.50, "center_y": 0.50})
 
-        overlay_text = TextInput(text="Enter the text to overlay", multiline=True, size_hint=(.75, 0.10),
+        overlay_text = TextInput(text="Enter Overlay Text", multiline=True, size_hint=(.75, 0.10),
                                  pos_hint={"center_x": .50, "center_y": .40})
 
-        self.add_widget(version_info)
-        self.add_widget(start_button)
-        self.add_widget(stop_button)
-        self.add_widget(add_overlay)
-        self.add_widget(overlay_text)
+        for widgets in [version_info, start_button, stop_button, add_overlay, path_to_video, overlay_text]:
+            self.add_widget(widgets)
+
+    def callback_start(self, filepath):
+        bCC = BcastClient(filepath)
+        t = Thread(bCC.run())
+        t.start()
+        t.join()
 
 
 class NewsBcastApp(App):

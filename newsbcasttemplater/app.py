@@ -1,5 +1,3 @@
-from threading import Thread
-
 from kivy.app import App
 from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
@@ -37,10 +35,7 @@ class CasterGUI(FloatLayout):
             self.add_widget(widgets)
 
     def callback_start(self, filepath):
-        bCC = BcastClient(filepath)
-        t = Thread(bCC.run())
-        t.start()
-        t.join()
+        BcastClient(filepath).run()
 
 
 class NewsBcastApp(App):

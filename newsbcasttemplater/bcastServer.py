@@ -1,5 +1,6 @@
 import socket
 import pickle
+import threading
 
 from videoWriter import videoWriter
 
@@ -11,19 +12,29 @@ class BcastServer:
         self.BUFFER_SIZE = 4096
         self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connection.bind((self.TCP_IP, self.TCP_PORT))
-        self.connection.listen(5)
-        self.connected_host, addr = self.connection.accept()
+        self.connection.listen(10)
+        self.threads = []
 
-    def close(self):
-        self.connected_host.close()
 
-    def run(self):
+    def accept_connections(self):
+        while True:
+            connected_host, addr = self.connection.accept()
+            t = threading.Thread(self.run(connected_host))
+            t.start()
+            self.threads.append(t)
+
+        for t in self.threads:
+            t.join()
+
+
+    def run(self, conn_host):
+
         global vid_metadata
         i = 0
         while True:
-            vid_metadata = str(self.connected_host.recv(1024))
+            vid_metadata = str(conn_host.recv(1024))
             if vid_metadata:
-                self.connected_host.send(b'OK')
+                conn_host.send(b'OK')
                 break
         # noinspection PyRedeclaration
         num_frames, sep, vid_metadata = vid_metadata.partition(';;')
@@ -42,7 +53,7 @@ class BcastServer:
             length = None
             message = ""
             while True:
-                data = self.connected_host.recv(self.BUFFER_SIZE)
+                data = conn_host.recv(self.BUFFER_SIZE)
                 if not data:
                     break
                 if length is None:
@@ -64,16 +75,16 @@ class BcastServer:
                     else:
                         continue
 
-            self.connected_host.send(b'FINFRAME')
+            conn_host.send(b'FINFRAME')
             i += 1
             print "Writing frame : " + str(i)
             frame = pickle.loads(message)
             vW.writer(frame)
             if i == num_frames or i > num_frames:
                 break
+        conn_host.close()
 
 
 if __name__ == "__main__":
     bCS = BcastServer()
-    bCS.run()
-    bCS.close()
+    bCS.accept_connections()

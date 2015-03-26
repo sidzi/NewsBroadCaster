@@ -3,6 +3,7 @@ import pickle
 import threading
 
 from videoWriter import videoWriter
+import overlayer
 
 
 class BcastServer:
@@ -49,6 +50,8 @@ class BcastServer:
 
         vW = videoWriter(vid_fps, vid_width, vid_height)
 
+        overlayer.getwandh(int(float(vid_width)), int(float(vid_height)))
+
         while True:
             length = None
             message = ""
@@ -79,6 +82,7 @@ class BcastServer:
             i += 1
             print "Writing frame : " + str(i)
             frame = pickle.loads(message)
+            frame = overlayer.overlay(frame, i)
             vW.writer(frame)
             if i == num_frames or i > num_frames:
                 break

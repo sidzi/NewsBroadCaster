@@ -1,7 +1,5 @@
 import cv2
 
-import overlayer
-
 
 class videoWriter:
     def __init__(self, vid_fps, vid_width, vid_height, filename="out", vid_format="mov"):
@@ -11,5 +9,4 @@ class videoWriter:
                                    (int(float(vid_width)), int(float(vid_height))))
 
     def writer(self, frame):
-        frame = overlayer.overlay(frame)
         self.out.write(frame)

@@ -1,2 +1,6 @@
 transfer audio
-add overlay
+{
+send overlay text through a seperate threaded connection after sending the video
+OR
+make overlaying a client side routine
+}

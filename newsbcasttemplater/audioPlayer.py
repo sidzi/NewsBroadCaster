@@ -1,7 +1,7 @@
 import wave
 import sys
 
-import pyaudio
+from pyaudio import PyAudio
 
 
 CHUNK = 1024
@@ -12,7 +12,7 @@ if len(sys.argv) < 2:
 
 wf = wave.open(sys.argv[1], 'rb')
 
-p = pyaudio.PyAudio()
+p = PyAudio()
 
 stream = p.open(format=p.get_format_from_width(wf.getsampwidth()), channels=wf.getnchannels(), rate=wf.getframerate(),
                 output=True)

@@ -15,7 +15,7 @@ class AudioRecorder:
 
     def record(self):
         if sys.platform == 'darwin':
-            CHANNELS = 1
+            self.CHANNELS = 1
 
         p = pyaudio.PyAudio()
 

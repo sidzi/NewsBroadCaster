@@ -1,16 +1,13 @@
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from distutils.core import setup
 
 config = {
-    'description': 'News Bcaster',
+    'description': 'News Broadcasting Software for the masses',
     'author': 'Siddhant Gupta',
-    'version': '0.1',
+    'version': '0.0.1',
+    'Author-email': 'ncb@ncb.com'
+                    'packages': ["newsBcasterClient"],
     'install_requires': ['pyaudio'],
-    'packages': ['newsbcaster'],
-    'scripts': [],
-    'name': 'newsbcasttemplater'
+                        'name': 'NewsBcaster'
 }
 
 setup(**config)

@@ -1,7 +1,7 @@
 import cv2
 
 
-class videoWriter:
+class VideoWriter:
     def __init__(self, vid_fps, vid_width, vid_height, filename="out", vid_format="mov"):
         self.fourcc = cv2.cv.CV_FOURCC('m', 'p', '4', 'v')
 

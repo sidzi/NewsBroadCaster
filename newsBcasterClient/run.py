@@ -1,10 +1,13 @@
+import os
+
 from kivy.app import App
 from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
-
+from kivy.uix.video import Video
 from bcastClient import BcastClient
+from audioExtracter import extract
 
 
 class CasterGUI(FloatLayout):
@@ -28,18 +31,26 @@ class CasterGUI(FloatLayout):
 
         upload_video.bind(on_press=lambda x: self.callback_start(path_to_video.text))
 
-        overlay_text = TextInput(text="Enter Overlay Text", multiline=True, size_hint=(.60, 0.10),
-                                 pos_hint={"center_x": .40, "center_y": .40})
+        overlay_text = TextInput(text="Headlines Go Here", multiline=True, size_hint=(.60, 0.10),
+                                 pos_hint={"center_x": .40, "center_y": .30})
 
         add_overlay = Button(text="Add Overlay", background_color=(1, 1, 1, 1), size_hint=(.20, 0.10),
-                             pos_hint={"center_x": 0.80, "center_y": 0.40})
+                             pos_hint={"center_x": 0.80, "center_y": 0.30})
+
+        video_previewer = Video(source="lmao.mp4", state='play', size_hint=(.32, 0.20),
+                                pos_hint={"center_x": 0.50, "center_y": 0.50})
+
+        record_start = Button(text="Audio Rec.", background_color=(0.9, 0.4, 0.1, 1), size_hint=(.10, .10),
+                              pos_hint={"center_x": 0.50, "center_y": 0.15})
 
         for widgets in [version_info, start_button, stop_button, add_overlay, path_to_video, overlay_text,
-                        upload_video]:
+                        upload_video, video_previewer, record_start]:
             self.add_widget(widgets)
 
     @staticmethod
     def callback_start(filepath):
+        if not os.path.exists(filepath):
+            extract(filepath)
         BcastClient(filepath).run()
 
 

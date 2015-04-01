@@ -3,7 +3,7 @@ import pickle
 import wave
 import os
 
-from videoReader import videoReader
+from VideoReader import videoReader
 
 
 class BcastClient:

@@ -20,6 +20,7 @@ class BcastClient:
         self.audio_size = os.path.getsize(filepath + "_audio.wav")
 
     def run(self):
+        # Video Transferring Here
         while True:
             self.connection.send(
                 "{0};;{1}::{2}??{3}".format(self.video.frame_count, self.video.frame_width, self.video.frame_height,
@@ -38,10 +39,9 @@ class BcastClient:
                 if "FINFRAME" in end_of_frame:
                     break
         self.connection.send("EOVT")
-        # Audio transferring to ba added here
+        # Audio Transferring Here
         if 'RRA' in self.connection.recv(self.SMALL_BUFFER):
             self.connection.send(str(self.audio_size))
-            print('FILE SIZE = {0}'.format(str(self.audio_size)))
             audio_data = self.wf.readframes(self.BUFFER_SIZE)
             while audio_data != '':
                 while True:

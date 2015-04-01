@@ -49,7 +49,7 @@ class CasterGUI(FloatLayout):
 
     @staticmethod
     def callback_start(filepath):
-        if not os.path.exists(filepath):
+        if not os.path.exists(str(str(filepath) + "_audio.wav")):
             extract(filepath)
         BcastClient(filepath).run()
 

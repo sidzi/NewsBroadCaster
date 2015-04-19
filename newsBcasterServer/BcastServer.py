@@ -5,6 +5,7 @@ import threading
 from VideoWriter import VideoWriter
 import overlayer
 import AudioWriter
+from newsBcasterServer.newsBcasterBroadcsater.app import app
 
 
 class BcastServer:
@@ -28,15 +29,17 @@ class BcastServer:
             t = threading.Thread(self.run(connected_host))
             t.start()
             self.threads.append(t)
-
         for t in self.threads:
             t.join()
 
-    def run(self, conn_host):
-
+    def recieve_video(self, conn_host):
+        # overlay text
+        overlay_text = str(conn_host.recv(self.BUFFER_SIZE))
+        if overlay_text:
+            conn_host.send(b'OK')
         # global vid_metadata
         i = 0
-        vid_metadata = str(conn_host.recv(1024))
+        vid_metadata = str(conn_host.recv(self.BUFFER_SIZE))
         if vid_metadata:
             conn_host.send(b'OK')
         # noinspection PyRedeclaration
@@ -66,7 +69,7 @@ class BcastServer:
                         break
 
                     length_str, ignored, data = data.partition('::')
-                    print '\nSize of the frame : {0}'.format(str(length_str))
+                    print '\nSize of the frame : {0}'.format(str(int(length_str) / 1024 * 8))
                     length = int(length_str)
 
                 if len(message) < length:
@@ -84,19 +87,20 @@ class BcastServer:
             i += 1
             print 'Writing frame : {0}'.format(str(i))
             frame = pickle.loads(message)
-            frame = overlayer.overlay(frame, i)
+            frame = overlayer.overlay(frame, i, overlay_text)
             vw.writer(frame)
             if i == num_frames or i > num_frames:
                 break
-        if 'EOVT' in str(conn_host.recv(self.SMALL_BUFFER)):
-            print '\nEnd of Video Transmission'
-        conn_host.send(b'RRA')  # Ready to recieve audio
+
+    def recieve_audio(self, conn_host):
+        # Ready to recieve audio
+        conn_host.send(b'RRA')
         file_size = int(conn_host.recv(self.SMALL_BUFFER))
         i = 1
         flag = 0
         audio_frames = []
         while True:
-            print('FILE SIZE = {0}'.format(str(file_size)))
+            print('FILE SIZE = {0}'.format(str(file_size / (1024))))
             length_audio = None
             audio_frame = ""
             while True:
@@ -110,8 +114,8 @@ class BcastServer:
                         break
 
                     length_audio, sep, audio_data = audio_data.partition('::')
-                    print '\nSize : {0}'.format(str(length_audio))
                     length_audio = int(length_audio)
+                    print '\nSize : {0}'.format(str(length_audio / (1024)))
 
                 if len(audio_frame) < length_audio:
                     audio_frame += audio_data
@@ -130,14 +134,34 @@ class BcastServer:
             audio_frames.append(audio_frame)
             conn_host.send(b'FINFRAME')
 
-            # if 'EOAT' in str(conn_host.recv(self.SMALL_BUFFER)):
-            # print('Audio Transmission Complete')
-            # break
-
         AudioWriter.write(audio_frames)
+
+    def run(self, conn_host):
+
+        while True:
+            choice = conn_host.recv(32)
+            choice = int(choice)
+            if choice is 0:
+                break
+            elif choice is 1:
+                conn_host.send(b'ok')
+                self.recieve_video(conn_host)
+                if not 'EOVT' in str(conn_host.recv(self.SMALL_BUFFER)):
+                    print "Error in recieving complete video"
+                    break
+
+            elif choice is 2:
+                conn_host.send(b'ok')
+                self.recieve_audio(conn_host)
+                if not 'End' in conn_host.recv(self.SMALL_BUFFER):
+                    print "Error in recieving complete audio"
+                    break
+            elif choice is 3:
+                app.run(self.TCP_IP, 8000)
         conn_host.close()
 
 
 if __name__ == "__main__":
     bCS = BcastServer()
+    print("Server Started at\nIP : " + str(bCS.TCP_IP) + "\nPort : " + str(bCS.TCP_PORT))
     bCS.accept_connections()

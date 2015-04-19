@@ -10,6 +10,8 @@ from BcastClient import BcastClient
 from audioextracter import extract
 
 
+global bcs
+
 class CasterGUI(FloatLayout):
     def __init__(self, **kwargs):
         super(CasterGUI, self).__init__(**kwargs)
@@ -20,8 +22,13 @@ class CasterGUI(FloatLayout):
         start_button = Button(text="Start Broadcast", background_color=(0, 1, .5, 1), size_hint=(.25, .10),
                               pos_hint={"center_x": 0.25, "center_y": 0.85})
 
+        start_button.bind(on_press=lambda x: self.callback_start())
+
         stop_button = Button(text="Stop Broadcast", background_color=(1, 0.1, 0.1, 1), size_hint=(.25, 0.10),
                              pos_hint={"center_x": 0.75, "center_y": 0.85})
+
+        stop_button.bind(on_press=lambda x: self.callback_stop())
+
 
         path_to_video = TextInput(focus=True, text="lmao.mp4", multiline=False, size_hint=(.60, 0.10),
                                   pos_hint={"center_x": .40, "center_y": .70})
@@ -29,10 +36,10 @@ class CasterGUI(FloatLayout):
         upload_video = Button(text="Upload Video", background_color=(0, 1, 1, 1), size_hint=(.20, .10),
                               pos_hint={"center_x": 0.80, "center_y": 0.70})
 
-        upload_video.bind(on_press=lambda x: self.callback_start(path_to_video.text))
-
         overlay_text = TextInput(text="Headlines Go Here", multiline=True, size_hint=(.60, 0.10),
                                  pos_hint={"center_x": .40, "center_y": .30})
+
+        upload_video.bind(on_press=lambda x: self.callback_upload(path_to_video.text, overlay_text.text))
 
         add_overlay = Button(text="Add Overlay", background_color=(1, 1, 1, 1), size_hint=(.20, 0.10),
                              pos_hint={"center_x": 0.80, "center_y": 0.30})
@@ -48,10 +55,22 @@ class CasterGUI(FloatLayout):
             self.add_widget(widgets)
 
     @staticmethod
-    def callback_start(filepath):
+    def callback_upload(filepath, o_text):
+        global bcs
         if not os.path.exists(str(str(filepath) + "_audio.wav")):
             extract(filepath)
-        BcastClient(filepath).run()
+        bcs = BcastClient(filepath, o_text)
+        bcs.send_video()
+
+    @staticmethod
+    def callback_start():
+        global bcs
+        bcs.start_broadcast()
+
+    @staticmethod
+    def callback_start():
+        global bcs
+        bcs.stop_broadcast()
 
 
 class NewsBcastApp(App):

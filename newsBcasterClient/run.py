@@ -68,7 +68,7 @@ class CasterGUI(FloatLayout):
         bcs.start_broadcast()
 
     @staticmethod
-    def callback_start():
+    def callback_stop():
         global bcs
         bcs.stop_broadcast()
 

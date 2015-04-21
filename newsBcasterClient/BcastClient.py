@@ -9,15 +9,15 @@ from VideoReader import videoReader
 class BcastClient:
     def __init__(self, filepath, overlay_text):
         self.TCP_IP = 'localhost'
-        self.TCP_PORT = 5000
+        self.TCP_PORT = 4000
         self.BUFFER_SIZE = 4096
         self.SMALL_BUFFER = 128
         self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connection.connect((self.TCP_IP, self.TCP_PORT))
         self.video = videoReader(filepath)
+        self.filepath = filepath
         self.cap = self.video.getcap()
         self.wf = wave.open(filepath + "_audio.wav", 'rb')
-        self.audio_size = os.path.getsize(filepath + "_audio.wav")
         self.o_text = overlay_text
 
     def send_video(self):
@@ -52,8 +52,9 @@ class BcastClient:
     def send_audio(self):
         # Audio Transferring Here
         self.connection.send(b'2')
-        if 'RRA' in self.connection.recv(self.SMALL_BUFFER):
-            self.connection.send(str(self.audio_size))
+        if 'ok' in self.connection.recv(4):
+            audio_size = os.path.getsize(self.filepath + "_audio.wav")
+            self.connection.send(str(audio_size))
             audio_data = self.wf.readframes(self.BUFFER_SIZE)
             while audio_data != '':
                 while True:
@@ -69,6 +70,8 @@ class BcastClient:
 
     def start_broadcast(self):
         self.connection.send(b'3')
+        if not 'ok' in self.connection.recv(self.SMALL_BUFFER):
+            print("Error in starting server")
 
     def stop_broadcast(self):
         self.connection.send(b'0')

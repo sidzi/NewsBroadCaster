@@ -1,11 +1,11 @@
 import socket
 import pickle
 import threading
+import subprocess
 
 from VideoWriter import VideoWriter
 import overlayer
 import AudioWriter
-from newsBcasterServer.newsBcasterBroadcsater.app import app
 
 
 class BcastServer:
@@ -14,13 +14,13 @@ class BcastServer:
         :rtype : BcastServer
         """
         self.TCP_IP = 'localhost'
-        self.TCP_PORT = 5000
+        self.TCP_PORT = 4000
+        self.SEVER_PORT = 8000
         self.BUFFER_SIZE = 4096
+        self.SMALL_BUFFER = 100
         self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connection.bind((self.TCP_IP, self.TCP_PORT))
         self.connection.listen(10)
-        self.rec_file_size = 0
-        self.SMALL_BUFFER = 100
         self.threads = []
 
     def accept_connections(self):
@@ -93,8 +93,8 @@ class BcastServer:
                 break
 
     def recieve_audio(self, conn_host):
-        # Ready to recieve audio
-        conn_host.send(b'RRA')
+        # recieve audio
+        rec_file_size = 0
         file_size = int(conn_host.recv(self.SMALL_BUFFER))
         i = 1
         flag = 0
@@ -130,7 +130,7 @@ class BcastServer:
                 break
 
             audio_frame = pickle.loads(audio_frame)
-            self.rec_file_size += len(audio_frame)
+            rec_file_size += len(audio_frame)
             audio_frames.append(audio_frame)
             conn_host.send(b'FINFRAME')
 
@@ -157,7 +157,10 @@ class BcastServer:
                     print "Error in recieving complete audio"
                     break
             elif choice is 3:
-                app.run(self.TCP_IP, 8000)
+                conn_host.send(b'ok')
+                command = "python newsBcasterBroadcsater/app.py"
+                subprocess.call(command, shell=True)
+
         conn_host.close()
 
 

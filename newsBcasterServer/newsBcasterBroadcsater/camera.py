@@ -9,7 +9,7 @@ class Camera(object):
 
     def __init__(self):
         global i
-        self.frames = [open("../out/" + str(f) + '.jpg', 'rb').read() for f in list(xrange(200))]
+        self.frames = [open("out/" + str(f) + '.jpg', 'rb').read() for f in list(xrange(200))]
         i = 0
 
     def get_frame(self):

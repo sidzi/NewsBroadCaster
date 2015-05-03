@@ -1,16 +1,18 @@
 import os
+
 from kivy.app import App
 from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from kivy.uix.video import Video
-
 from BcastClient import BcastClient
 from audioextracter import extract
+from AudioRecorder import AudioRecorder
 
 
 global bcs
+
 
 class CasterGUI(FloatLayout):
     def __init__(self, **kwargs):
@@ -28,7 +30,6 @@ class CasterGUI(FloatLayout):
                              pos_hint={"center_x": 0.75, "center_y": 0.85})
 
         stop_button.bind(on_press=lambda x: self.callback_stop())
-
 
         path_to_video = TextInput(focus=True, text="lmao.mp4", multiline=False, size_hint=(.60, 0.10),
                                   pos_hint={"center_x": .40, "center_y": .70})
@@ -49,6 +50,8 @@ class CasterGUI(FloatLayout):
 
         record_start = Button(text="Audio Rec.", background_color=(0.9, 0.4, 0.1, 1), size_hint=(.10, .10),
                               pos_hint={"center_x": 0.50, "center_y": 0.15})
+
+        stop_button.bind(on_press=lambda x: self.rec_start())
 
         for widgets in [version_info, start_button, stop_button, add_overlay, path_to_video, overlay_text,
                         upload_video, video_previewer, record_start]:
@@ -71,6 +74,11 @@ class CasterGUI(FloatLayout):
     def callback_stop():
         global bcs
         bcs.stop_broadcast()
+
+    @staticmethod
+    def rec_start(time=5):
+        recorder = AudioRecorder(time)
+        recorder.record()
 
 
 class NewsBcastApp(App):

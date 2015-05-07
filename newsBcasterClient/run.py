@@ -9,16 +9,20 @@ from kivy.uix.checkbox import CheckBox
 from BcastClient import BcastClient
 from audioextracter import extract
 from AudioRecorder import AudioRecorder
+from fetch_news import crawl_news
 
 
 global bcs
 global recflag
+global text
 
 
 class CasterGUI(FloatLayout):
     def __init__(self, **kwargs):
         global recflag
         recflag = False
+        global text
+        text = None
         super(CasterGUI, self).__init__(**kwargs)
 
         version_info = Label(text="NewsBcaster v0.1", font_size=20, size_hint=(1, 0.5),
@@ -62,6 +66,8 @@ class CasterGUI(FloatLayout):
         fetch_headlines = Button(text="Fetch Headlines", background_color=(0.9, 0.4, 0.1, 1), size_hint=(.20, .10),
                                  pos_hint={"center_x": 0.25, "center_y": 0.30})
 
+        fetch_headlines.bind(on_press=lambda x: self.fetch_start())
+
         record_start.bind(on_press=lambda x: self.rec_start())
 
         stop_button.bind(on_press=lambda x: self.rec_start())
@@ -72,9 +78,11 @@ class CasterGUI(FloatLayout):
 
     @staticmethod
     def callback_upload(filepath, o_text):
-        global bcs, recflag
+        global bcs, recflag, text
         if not os.path.exists(str(str(filepath) + "_audio.wav")):
             extract(filepath)
+        if text is not None:
+            o_text = text
         bcs = BcastClient(filepath, o_text)
         bcs.send_video(recflag)
 
@@ -92,6 +100,13 @@ class CasterGUI(FloatLayout):
     def rec_start(time=5):
         recorder = AudioRecorder(time)
         recorder.record()
+
+    @staticmethod
+    def fetch_start():
+        global text
+        text = ""
+        text = crawl_news()
+
 
 
 def on_checkbox_active(checkbox, value):

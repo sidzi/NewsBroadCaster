@@ -1,6 +1,4 @@
-1.Test for other videos
 2.Try to fix the issue of video preview by some clever way
 3.Test packaging and installing
 4.Remove tests folder
 5.add flask to setup file
-6.test audio recording

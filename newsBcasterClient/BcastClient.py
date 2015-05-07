@@ -17,10 +17,9 @@ class BcastClient:
         self.video = videoReader(filepath)
         self.filepath = filepath
         self.cap = self.video.getcap()
-        self.wf = wave.open(filepath + "_audio.wav", 'rb')
         self.o_text = overlay_text
 
-    def send_video(self):
+    def send_video(self, flagrec):
         # Overlay Transfer Here
         self.connection.send(b'1')
         if 'ok' in self.connection.recv(4):
@@ -47,15 +46,22 @@ class BcastClient:
                     if "FINFRAME" in end_of_frame:
                         break
             self.connection.send("EOVT")
-            self.send_audio()
+            self.send_audio(flagrec)
 
-    def send_audio(self):
+    def send_audio(self, flagrec):
         # Audio Transferring Here
+        if not flagrec:
+            wf = wave.open(self.filepath + "_audio.wav", 'rb')
+        else:
+            wf = wave.open("out_rec.wav", 'rb')
         self.connection.send(b'2')
         if 'ok' in self.connection.recv(4):
-            audio_size = os.path.getsize(self.filepath + "_audio.wav")
+            if not flagrec:
+                audio_size = os.path.getsize(self.filepath + "_audio.wav")
+            else:
+                audio_size = os.path.getsize("out_rec.wav")
             self.connection.send(str(audio_size))
-            audio_data = self.wf.readframes(self.BUFFER_SIZE)
+            audio_data = wf.readframes(self.BUFFER_SIZE)
             while audio_data != '':
                 while True:
                     audio_data_dup = pickle.dumps(audio_data)
@@ -64,7 +70,7 @@ class BcastClient:
                     end_of_aframe = str(self.connection.recv(self.BUFFER_SIZE))
                     if 'FINFRAME' in end_of_aframe:
                         break
-                audio_data = self.wf.readframes(self.BUFFER_SIZE)
+                audio_data = wf.readframes(self.BUFFER_SIZE)
             self.connection.send(b'ENDALL')
             self.connection.send(b'End')
 

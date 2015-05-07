@@ -1,9 +1,15 @@
+import os
+
 from flask import Flask, render_template, Response
 
-from newsBcasterServer.newsBcasterBroadcsater.camera import Camera
+from newsBcasterServer.newsBcasterBroadcaster.camera import Camera
 
-app = Flask(__name__)
 
+tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
+
+static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
+
+app = Flask(__name__, template_folder=tmpl_dir, static_folder=static_dir)
 
 @app.route("/")
 def index_page():

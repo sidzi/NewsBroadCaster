@@ -158,7 +158,7 @@ class BcastServer:
                     break
             elif choice is 3:
                 conn_host.send(b'ok')
-                command = "python newsBcasterBroadcsater/app.py"
+                command = "python newsBcasterBroadcaster/app.py"
                 subprocess.call(command, shell=True)
 
         conn_host.close()

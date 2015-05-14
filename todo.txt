@@ -1,6 +1,4 @@
-transfer audio
-{
-send overlay text through a seperate threaded connection after sending the video
-OR
-make overlaying a client side routine
-}
+2.Try to fix the issue of video preview by some clever way
+3.Test packaging and installing
+4.Remove tests folder
+5.add flask to setup file

@@ -11,7 +11,7 @@ class AudioRecorder:
         self.CHANNELS = 2
         self.RATE = 44100
         self.RECORD_SEC = time
-        self.WAVE_OUT_NAME = "out.wav"
+        self.WAVE_OUT_NAME = "out_rec.wav"
 
     def record(self):
         if sys.platform == 'darwin':
